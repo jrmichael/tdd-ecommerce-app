@@ -38,12 +38,23 @@ public class Money {
     }
 
     public Money add(Money other) {
-        int newValue = this.moneyAsCents + other.moneyAsCents;
-        return new Money(newValue / 100, newValue % 100);
+        return convertCentsToMoney(this.moneyAsCents + other.moneyAsCents);
     }
 
     @Override
     public String toString() {
-        return moneyAsCents/100 + ","+moneyAsCents % 100;
+        return moneyAsCents / 100 + "," + moneyAsCents % 100;
+    }
+
+    public Money multiply(int quantity) {
+        return convertCentsToMoney(this.moneyAsCents * quantity);
+    }
+
+    private Money convertCentsToMoney(int cents) {
+        return new Money(cents / 100, cents % 100);
+    }
+
+    public boolean isGreaterThan(Money money) {
+        return moneyAsCents > money.moneyAsCents;
     }
 }

@@ -20,18 +20,19 @@ public class CartItem {
     private Money price;
 
     private int quantity;
-    @ManyToOne
-    Cart cart;
 
     private CartItem() {
-
     }
 
-    public CartItem(Product product, int quantity) {
+    public CartItem(Product product, int quantity, Cart cart) {
         this.productId = product.getId();
         this.price = product.getPrice();
         this.quantity = quantity;
+        this.cart = cart;
     }
+
+    @ManyToOne
+    Cart cart;
 
     @Override
     public boolean equals(Object o) {
@@ -61,7 +62,32 @@ public class CartItem {
                 .toHashCode();
     }
 
+    public long getProductId() {
+        return productId;
+    }
+
     public Money getPrice() {
         return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "productId=" + productId +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
+    }
+
+    public void increaseQuantity(int quantity) {
+        this.quantity += quantity;
     }
 }

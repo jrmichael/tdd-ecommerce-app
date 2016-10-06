@@ -10,19 +10,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import pl.pragmatists.trainings.ecommerce.MvcBaseTest;
 import pl.pragmatists.trainings.ecommerce.common.Money;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Transactional
-public class ProductRoundtripTest {
-
-    @Autowired
-    private TestEntityManager em;
+public class ProductRoundtripTest extends MvcBaseTest {
 
     @Test
     public void save_and_load_product() {
-        Product product = new Product(1L, "cup", new Money(1,25));
+        Product product = ProductBuilder.aProduct().id(1L).name("cup").price(1,25).build();
 
         em.persistAndFlush(product);
         em.clear();

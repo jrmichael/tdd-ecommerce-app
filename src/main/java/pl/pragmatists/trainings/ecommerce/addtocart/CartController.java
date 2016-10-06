@@ -16,6 +16,8 @@ import pl.pragmatists.trainings.ecommerce.addtocart.json.CartItemJson;
 import pl.pragmatists.trainings.ecommerce.addtocart.json.CartJson;
 import pl.pragmatists.trainings.ecommerce.cart.Cart;
 import pl.pragmatists.trainings.ecommerce.cart.CartItem;
+import pl.pragmatists.trainings.ecommerce.common.Money;
+import pl.pragmatists.trainings.ecommerce.product.persistence.Product;
 import pl.pragmatists.trainings.ecommerce.product.persistence.ProductRepository;
 
 @Controller
@@ -29,8 +31,21 @@ public class CartController {
 
     @RequestMapping(value = "/user/{userId}/cart/items", method = RequestMethod.POST)
     public ResponseEntity add(@PathVariable Long userId, @RequestBody CartItemJson cartItemJson) {
-        CartItem cartItem = new CartItem(productRepository.findOne(cartItemJson.productId), cartItemJson.quantity);
-        Cart cart = new Cart(userId).withItems(asList(cartItem));
+        Product product = productRepository.findOne(cartItemJson.productId);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        int quantity = cartItemJson.quantity;
+        if (quantity < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null) {
+            cart = new Cart(userId);
+        }
+        cart.add(product, quantity);
         cartRepository.save(cart);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -39,7 +54,9 @@ public class CartController {
     public @ResponseBody CartJson get(@PathVariable Long userId) {
         Cart cart = cartRepository.findByUserId(userId);
         CartJson cartJson = new CartJson();
-        cartJson.total = cart.total().toString();
+        Money total = cart.total();
+        cartJson.total = total.toString();
+        cartJson.shipping = cart.shipping(total).toString();
         return cartJson;
     }
 
